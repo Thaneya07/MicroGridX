@@ -1,34 +1,29 @@
+import json
 import pandas as pd
 import joblib
 
-# Load model
-model = joblib.load("fault_model.pkl")
+# Load XGBoost model
+model = joblib.load("xgboost_fault_model.pkl")
 
-def predict_fault(Ia, Ib, Ic, Va, Vb, Vc):
+# Read sensor data
+with open("sensor_data.json", "r") as f:
+    data = json.load(f)
 
-    data = pd.DataFrame({
-        "Ia": [Ia],
-        "Ib": [Ib],
-        "Ic": [Ic],
-        "Va": [Va],
-        "Vb": [Vb],
-        "Vc": [Vc]
-    })
+# Convert to dataframe
+df = pd.DataFrame({
+    "Ia": [data["Ia"]],
+    "Ib": [data["Ib"]],
+    "Ic": [data["Ic"]],
+    "Va": [data["Va"]],
+    "Vb": [data["Vb"]],
+    "Vc": [data["Vc"]]
+})
 
-    prediction = model.predict(data)
+# Predict
+prediction = model.predict(df)
 
-    if prediction[0] == 0:
-        return "NORMAL"
-    else:
-        return "FAULT"
-
-result = predict_fault(
-    -100,
-    20,
-    80,
-    0.3,
-    -0.4,
-    0.5
-)
-
-print("Status:", result)
+# Output
+if prediction[0] == 0:
+    print("NORMAL")
+else:
+    print("FAULT")
