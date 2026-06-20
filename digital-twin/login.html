@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>MicroGridX Login</title>
+
+<style>
+body{
+margin:0;
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#020617,#0f172a);
+font-family:Segoe UI;
+color:white;
+}
+
+/* glass card */
+.card{
+background:rgba(255,255,255,0.05);
+backdrop-filter:blur(10px);
+padding:40px;
+border-radius:15px;
+width:320px;
+box-shadow:0 0 30px rgba(0,0,0,0.5);
+text-align:center;
+}
+
+/* title */
+h2{
+color:#38bdf8;
+margin-bottom:20px;
+}
+
+/* input */
+input{
+width:100%;
+padding:12px;
+margin-top:12px;
+background:#020617;
+border:1px solid #334155;
+color:white;
+border-radius:8px;
+}
+
+/* button */
+button{
+width:100%;
+padding:12px;
+margin-top:20px;
+background:#38bdf8;
+border:none;
+color:black;
+font-weight:bold;
+cursor:pointer;
+border-radius:8px;
+transition:0.3s;
+}
+
+button:hover{
+background:#0ea5e9;
+}
+
+/* links */
+.links{
+margin-top:15px;
+font-size:13px;
+color:#94a3b8;
+}
+
+.links span{
+cursor:pointer;
+color:#38bdf8;
+}
+
+.links span:hover{
+text-decoration:underline;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+<h2>⚡ MicroGridX</h2>
+
+<input id="username" placeholder="Username">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<button onclick="signup()">Sign Up</button>
+
+<div class="links">
+<span onclick="forgot()">Forgot Password?</span>
+</div>
+
+</div>
+
+<script>
+
+async function login(){
+
+let u=document.getElementById("username").value
+let p=document.getElementById("password").value
+
+const res = await fetch("/login", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username:u,password:p})
+})
+
+const data = await res.json()
+
+if(data.status==="success"){
+window.location.href="/dashboard"
+}else{
+alert("Invalid Credentials ❌")
+}
+}
+
+async function signup(){
+
+let u=document.getElementById("username").value
+let p=document.getElementById("password").value
+
+const res = await fetch("/signup", {
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({username:u,password:p})
+})
+
+const data = await res.json()
+
+if(data.status==="success"){
+alert("Account created ✅")
+}else{
+alert(data.message)
+}
+}
+
+function forgot(){
+alert("Demo: Contact Admin 😄")
+}
+
+</script>
+
+</body>
+</html>
