@@ -205,3 +205,17 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Datasets
+fault_prediction/battery_fault/data/
+fault_prediction/battery_fault/*.csv
+
+fault_prediction/sensor_fault/*.csv
+
+fault_prediction/anomaly_detection/*.csv
+
+fault_prediction/dataset/*.csv
+
+# Python cache
+__pycache__/
+*.pyc
