@@ -1,0 +1,10 @@
+{
+    "battery_id": "B0036",
+    "soh": 84.1,
+    "battery_status": "HEALTHY",
+    "risk_score": 15.9,
+    "failure_probability": 0.16,
+    "thermal_risk": "LOW",
+    "efficiency_score": 84.1,
+    "maintenance_recommendation": "No Action Required"
+}

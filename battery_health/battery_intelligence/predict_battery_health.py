@@ -147,3 +147,34 @@ print(f"Efficiency Score: {predicted_soh:.2f}")
 print(
     f"Maintenance Recommendation: {maintenance}"
 )
+import json
+
+output = {
+    "battery_id": "B0036",
+
+    "soh": round(predicted_soh, 2),
+
+    "battery_status": status,
+
+    "risk_score": risk,
+
+    "failure_probability": failure,
+
+    "thermal_risk": thermal,
+
+    "efficiency_score": round(predicted_soh, 2),
+
+    "maintenance_recommendation": maintenance
+}
+
+with open(
+    "battery_output.json",
+    "w"
+) as f:
+    json.dump(
+        output,
+        f,
+        indent=4
+    )
+
+print("\nJSON Output Saved!")

@@ -1,0 +1,8 @@
+{
+    "fault_probability": 0.3,
+    "fault_status": "WARNING",
+    "electrical_fault": "5",
+    "battery_health": 0.72,
+    "sensor_fault": 0,
+    "system_anomaly": 0
+}

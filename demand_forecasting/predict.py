@@ -35,5 +35,28 @@ prediction = model.predict(X)
 
 predicted_value = scaler.inverse_transform(prediction)
 
+import json
+
+predicted_demand = float(
+    predicted_value[0][0]
+)
+
+output = {
+    "predicted_demand": predicted_demand,
+    "model": "LSTM"
+}
+
+with open(
+    "demand_output.json",
+    "w"
+) as f:
+    json.dump(
+        output,
+        f,
+        indent=4
+    )
+
 print("\nPredicted Future Demand:")
-print(predicted_value[0][0], "kW")
+print(predicted_demand, "kW")
+
+print("\nDemand JSON Saved!")
