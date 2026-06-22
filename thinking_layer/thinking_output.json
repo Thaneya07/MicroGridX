@@ -1,0 +1,9 @@
+{
+    "battery_soh": 84.1,
+    "predicted_demand": 0.94,
+    "predicted_solar": 15389.96,
+    "energy_surplus": 15389.02,
+    "battery_failure_probability": 0.16,
+    "fault_probability": 0.3,
+    "grid_health_score": 0.867
+}

@@ -607,7 +607,6 @@ body.light-mode #communityMsg {
 <button onclick="scrollToSection('overviewSection')">Overview</button>
 <button onclick="scrollToSection('alertsSection')">Alerts</button>
 <button onclick="scrollToSection('analyticsSection')">Analytics</button>
-<button onclick="scrollToSection('communitySection')">Community</button>
  <button id="themeBtn" onclick="toggleTheme()">🌙</button>
 </div>
 </div>
@@ -641,16 +640,33 @@ body.light-mode #communityMsg {
 <h2 id="overview" class="section-title">System Overview</h2>
 
 <div class="container">
-<div class="card"><h4>☀ Solar</h4><p id="solar">--</p></div>
-<div class="card"><h4>🔋 Battery</h4><p id="battery">--</p><div class="battery-bar"><div id="battery-level"></div></div></div>
-<div class="card"><h4>🌡 Temperature</h4><p id="temp">--</p></div>
-<div class="card"><h4>🔮 Demand</h4><p id="prediction">--</p></div>
+
+<div class="card">
+<h4>☀ Solar Forecast AI</h4>
+<p id="solar">--</p>
 </div>
-<h3>🔮 Simulation Mode</h3>
 
-<input type="range" min="100" max="500" value="200" id="simDemand">
+<div class="card">
+<h4>🔋 Battery Intelligence AI</h4>
+<p id="battery">--</p>
 
-<p>Simulated Demand: <span id="simValue">200</span> W</p>
+<div class="battery-bar">
+<div id="battery-level"></div>
+</div>
+
+</div>
+
+<div class="card">
+<h4>📈 Demand Forecast AI</h4>
+<p id="prediction">--</p>
+</div>
+
+<div class="card">
+<h4>⚠ Fault Prediction AI</h4>
+<p id="faultProbability">30%</p>
+</div>
+
+</div>
 
 <div class="status" id="systemStatus">Waiting...</div>
 
@@ -658,16 +674,39 @@ body.light-mode #communityMsg {
 <div id="recommendBox" style="margin-top:15px;padding:10px;border:1px solid cyan;border-radius:8px;">
 💡 Recommendation: Waiting...
 </div>
-<div id="healthBox">System Health: <span id="healthStatus">--</span></div>
-<div id="gameBox" style="margin-top:15px;padding:10px;border:1px solid #22c55e;border-radius:8px;">
-    <div id="costBox" style="margin-top:15px;padding:10px;border:1px solid #38bdf8;border-radius:8px;">
-        <button onclick="startVoice()" style="margin-top:15px;padding:10px;border-radius:8px;border:none;background:#38bdf8;color:black;cursor:pointer;">
-🎤 Ask System
-</button>
-💰 Cost: ₹<span id="cost">0</span><br>
-💚 Saved: ₹<span id="saved">0</span>
+<div class="card" style="margin-top:20px;text-align:center;">
+
+<h3>🧠 AI Fusion Core</h3>
+
+<h1 id="gridHealth"
+style="
+font-size:48px;
+color:#38bdf8;
+margin:10px 0;
+">
+86.7%
+</h1>
+
+<p>Grid Health Score</p>
+
 </div>
-🏆 Energy Score: <span id="score">0</span>
+<div class="card" style="margin-top:20px;">
+
+<h3>🤖 Decision Engine</h3>
+
+<p>
+Decision Score:
+<span id="decisionScore">
+92%
+</span>
+</p>
+
+<h2
+id="decisionAction"
+style="color:#22c55e;">
+Waiting...
+</h2>
+
 </div>
 <h2 id="alerts" class="section-title">Smart Alerts</h2>
 
@@ -712,6 +751,7 @@ gsmBox.innerText="📡 SMS: "+msg
 
 // 🔥 FIXED FETCH (IMPORTANT)
 async function fetchData(){
+console.log("fetchData running")
 try{
 
 systemStatus.innerText="Connecting..."
@@ -721,60 +761,85 @@ const res = await fetch("/api/data")
 if(!res.ok) throw new Error()
 
 const data = await res.json()
+console.log(data)
 
 systemStatus.innerText="Mode: "+data.decision.energy_mode+" ✅"
 
 solar.innerText=data.energy_status.solar_power+" W"
 battery.innerText=data.energy_status.battery_level+"%"
-temp.innerText=data.energy_status.temperature+" °C"
-prediction.innerText = simulatedDemand + " W"
+prediction.innerText =
+data.energy_status.predicted_demand
++ " kW"
+document.getElementById(
+"faultProbability"
+).innerText =
+(
+data.energy_status.fault_probability * 100
+).toFixed(0)
++ "%"
 
 document.getElementById("battery-level").style.width=data.energy_status.battery_level+"%"
 
-aiSummary.innerText="🧠 AI: "+data.decision.system_action
-// 🎮 Gamification Logic
-let score = Math.floor(data.energy_status.solar_power / 10)
+document.getElementById(
+"decisionAction"
+).innerText =
+data.decision.system_action
 
-document.getElementById("score").innerText = score
-
-if(score > 25){
-showPopup("🏆 Excellent Energy Saving!", "green")
-}
-
-// 💰 Cost Calculation
-let cost = (simulatedDemand * 0.02).toFixed(2)
-let saved = (data.energy_status.solar_power * 0.015).toFixed(2)
-
-document.getElementById("cost").innerText = cost
-document.getElementById("saved").innerText = saved
+document.getElementById(
+"gridHealth"
+).innerText =
+(
+data.system_health * 100
+).toFixed(1)
++ "%"
+document.getElementById(
+"aiSummary"
+).innerHTML =
+"🧠 AI Analysis: Grid Health "
++ (data.system_health * 100).toFixed(1)
++ "% | Decision: "
++ data.decision.system_action
 
 // 🧠 AI Recommendation Logic
 let recommendation = ""
 
 if(data.energy_status.battery_level < 30){
-    recommendation = "⚠ Reduce usage to save battery"
+
+recommendation =
+"⚠ Reduce usage to save battery"
+
 }
-else if(simulatedDemand > data.energy_status.solar_power){
-    recommendation = "⚡ Use appliances after solar peak"
+else if(
+data.energy_status.predicted_demand >
+data.energy_status.solar_power
+){
+
+recommendation =
+"⚡ Use appliances after solar peak"
+
 }
 else{
-    recommendation = "✅ System running optimally"
+
+recommendation =
+"✅ System running optimally"
+
 }
 
-document.getElementById("recommendBox").innerText =
-"💡 Recommendation: " + recommendation
-
-let health=data.system_health
-healthStatus.innerText=health
-
-if(health==="GREEN") healthStatus.style.color="#22c55e"
-else if(health==="YELLOW") healthStatus.style.color="#facc15"
-else healthStatus.style.color="#ef4444"
+document.getElementById("recommendBox").innerHTML =
+"💡 <b>AI Recommendation:</b> " + recommendation
+document.getElementById(
+"gridHealth"
+).innerText =
+(
+data.system_health * 100
+).toFixed(1)
++ "%"
 
 // CLEAR ALERTS
-alert1.innerText=""
-alert2.innerText=""
-alert3.innerText=""
+// CLEAR ALERTS
+if(alert1) alert1.innerText=""
+if(alert2) alert2.innerText=""
+if(alert3) alert3.innerText=""
 
 // ALERT LOGIC
 if(data.energy_status.battery_level<25){
@@ -795,13 +860,19 @@ sendSMS("Temp High")
 alert3.innerText="🔥 Temperature High"
 }
 
-}catch{
-systemStatus.innerText="⏳ Server waking up..."
-}
-}
-let simulatedDemand = 200
-setInterval(fetchData,2000)
+}catch(error){
 
+console.error(error)
+
+systemStatus.innerText=
+"⏳ Server waking up..."
+
+
+}
+}
+
+setInterval(fetchData,2000)
+fetchData()
 // GRAPH
 new Chart(document.getElementById("energyChart"),{
 type:"line",
@@ -816,40 +887,7 @@ datasets:[
 
 
 </script>
-<!-- ✅ COMMUNITY UI HERE -->
- <div id="communitySection">
-<h2 class="section-title">🌐 Community Energy Sharing</h2>
 
-<div style="display:flex;justify-content:center;align-items:center;gap:40px;margin-top:25px;flex-wrap:wrap;">
-
-    <!-- House A -->
-    <div class="card" style="text-align:center;padding:15px 25px;">
-        <h3>🏠 House A</h3>
-        <p id="houseA">--</p>
-        <small style="color:#22c55e;">Energy Source</small>
-    </div>
-
-    <!-- Arrow -->
-    <div class="arrow" style="font-size:32px;">⚡➡️</div>
-
-    <!-- House B -->
-    <div class="card" style="text-align:center;padding:15px 25px;">
-        <h3>🏠 House B</h3>
-        <p id="houseB">--</p>
-        <small style="color:#ef4444;">Energy Receiver</small>
-    </div>
-</div>
-</div>
-
-<!-- Energy Transfer -->
-<div style="text-align:center;margin-top:20px;">
-    <h3 id="energyTransfer">Energy Transfer: --</h3>
-
-    <!-- ✅ NEW SMART MESSAGE -->
-    <p id="communityMsg" style="margin-top:10px;color:#38bdf8;">
-        Smart energy redistribution active ⚡
-    </p>
-</div>
 
 <!-- EXISTING SCRIPT -->
 <script>
@@ -902,14 +940,7 @@ function scrollToSection(id){
         console.log("Section not found:", id);
     }
 }
-let slider = document.getElementById("simDemand")
 
-if(slider){
-slider.oninput = function(){
-simulatedDemand = this.value
-document.getElementById("simValue").innerText = this.value
-}
-}
 // 🎤 Voice Assistant
 function startVoice(){
 
@@ -941,5 +972,5 @@ alert("Command not recognized")
 }
 </script>
 </body>
-<script src="/static/js/twin.js"></script>
+
 </html>

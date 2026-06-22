@@ -1,49 +1,81 @@
 import json
+import os
+
+# ==========================
+# PROJECT ROOT
+# ==========================
+
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
 
 # ==========================
 # LOAD AI OUTPUTS
 # ==========================
 
 with open(
-    "../solar_forecasting/solar_output.json",
-    "r"
-) as f:
-    solar = json.load(f)
-
-with open(
-    "../demand_forecasting/prediction_output.json",
-    "r"
-) as f:
-    demand = json.load(f)
-
-with open(
-    "../battery_health/battery_intelligence/battery_output.json",
-    "r"
+    os.path.join(
+        BASE_DIR,
+        "battery_health",
+        "battery_intelligence",
+        "battery_output.json"
+    )
 ) as f:
     battery = json.load(f)
 
 with open(
-    "../fault_prediction/final_fault_report.json",
-    "r"
+    os.path.join(
+        BASE_DIR,
+        "demand_forecasting",
+        "prediction_output.json"
+    )
+) as f:
+    demand = json.load(f)
+
+with open(
+    os.path.join(
+        BASE_DIR,
+        "solar_forecasting",
+        "solar_output.json"
+    )
+) as f:
+    solar = json.load(f)
+
+with open(
+    os.path.join(
+        BASE_DIR,
+        "fault_prediction",
+        "fault_output.json"
+    )
 ) as f:
     fault = json.load(f)
 
 # ==========================
-# EXTRACT VALUES
+# EXTRACT AI VALUES
 # ==========================
 
-predicted_solar = solar["predicted_solar"]
+soh = battery["soh"]
 
-predicted_demand = demand["predicted_demand"]
+battery_failure = battery[
+    "failure_probability"
+]
 
-battery_soh = battery["soh"]
+predicted_demand = demand[
+    "predicted_demand"
+]
 
-battery_rul = battery["rul"]
+predicted_solar = solar[
+    "predicted_solar"
+]
 
-fault_probability = fault["fault_probability"]
+fault_probability = fault[
+    "fault_probability"
+]
 
 # ==========================
-# AI FUSION ENGINE
+# AI FUSION
 # ==========================
 
 energy_surplus = (
@@ -51,54 +83,45 @@ energy_surplus = (
     predicted_demand
 )
 
-# Battery Health Score
+battery_score = soh / 100
 
-battery_score = (
-    battery_soh / 100
-)
-
-# Risk Score
+energy_score = min(
+    predicted_solar /
+    max(predicted_demand, 1),
+    100
+) / 100
 
 risk_score = (
     1 -
-    fault_probability
+    (
+        battery_failure +
+        fault_probability
+    ) / 2
 )
 
-# Grid Stability Score
-
-grid_score = (
-    0.4 * battery_score +
-    0.3 * risk_score +
-    0.3 * (
-        predicted_solar /
-        max(predicted_demand, 1)
-    )
+grid_health_score = round(
+    (
+        0.4 * battery_score +
+        0.3 * energy_score +
+        0.3 * risk_score
+    ),
+    3
 )
 
 # ==========================
-# HEALTH LABELS
-# ==========================
-
-if grid_score > 0.8:
-    grid_status = "STABLE"
-
-elif grid_score > 0.5:
-    grid_status = "MODERATE"
-
-else:
-    grid_status = "CRITICAL"
-
-# ==========================
-# SAVE OUTPUT
+# OUTPUT
 # ==========================
 
 output = {
 
-    "predicted_solar":
-    predicted_solar,
+    "battery_soh":
+    soh,
 
     "predicted_demand":
     predicted_demand,
+
+    "predicted_solar":
+    predicted_solar,
 
     "energy_surplus":
     round(
@@ -106,23 +129,14 @@ output = {
         2
     ),
 
-    "battery_soh":
-    battery_soh,
-
-    "battery_rul":
-    battery_rul,
+    "battery_failure_probability":
+    battery_failure,
 
     "fault_probability":
     fault_probability,
 
-    "grid_score":
-    round(
-        grid_score,
-        3
-    ),
-
-    "grid_status":
-    grid_status
+    "grid_health_score":
+    grid_health_score
 }
 
 with open(
@@ -135,6 +149,8 @@ with open(
         f,
         indent=4
     )
+
+print("\n===== THINKING LAYER OUTPUT =====\n")
 
 print(
     json.dumps(

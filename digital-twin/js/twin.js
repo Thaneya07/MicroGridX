@@ -1,4 +1,3 @@
-
 let solarPower = 280
 let batteryLevel = 78
 let temperature = 34
