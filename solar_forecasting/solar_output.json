@@ -1,0 +1,5 @@
+{
+    "timestamp": "2026-06-22T13:13:01.028090",
+    "predicted_solar": 15389.96,
+    "model": "LSTM"
+}
