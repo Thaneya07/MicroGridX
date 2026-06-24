@@ -659,12 +659,14 @@ style="margin-top:30px;">
 
 <div class="container">
 
-<div class="card">
-<h4>☀ Solar Forecast AI</h4>
-<p id="solar">--</p>
+<div class="card"
+title="Predicts future solar generation using weather and historical solar data.">
+    <h4>☀ Solar Forecast AI</h4>
+    <p id="solar">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Monitors battery health, charge level and battery performance in real time.">
 <h4>🔋 Battery Intelligence AI</h4>
 <p id="battery">--</p>
 
@@ -674,43 +676,52 @@ style="margin-top:30px;">
 
 </div>
 
-<div class="card">
+<div class="card"
+title="Predicts future energy demand using historical consumption patterns.">
 <h4>📈 Demand Forecast AI</h4>
 <p id="prediction">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Detects abnormal conditions and predicts faults before failure.">
 <h4>⚠ Fault Prediction AI</h4>
 <p id="faultProbability">30%</p>
 </div>
 
 <!-- LIVE SENSOR CARDS -->
 
-<div class="card">
+<div class="card"
+title="Real-time temperature collected from DHT22 sensor.">
 <h4>🌡 Temperature</h4>
 <p id="liveTemp">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Real-time humidity collected from DHT22 sensor.">
 <h4>💧 Humidity</h4>
 <p id="liveHumidity">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Live voltage measurement from INA219 sensor.">
 <h4>⚡ Voltage</h4>
 <p id="liveVoltage">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Live current measurement from INA219 sensor.">
 <h4>🔌 Current</h4>
 <p id="liveCurrent">--</p>
 </div>
 
-<div class="card">
+<div class="card"
+title="Displays current battery percentage and backup availability.">
 <h4>🔋 Live Battery</h4>
 <p id="liveBattery">--</p>
 </div>
-<div class="card">
+
+<div class="card"
+title="Shows ESP32 communication and network connectivity status.">
 <h4>📶 Network</h4>
 <p id="networkStatus">ONLINE</p>
 </div>
@@ -735,9 +746,10 @@ margin-bottom:10px;
 ">
 SYSTEM HEALTHY
 </div>
-
-<h3>🧠 AI Fusion Core</h3>
-
+<div class="fusion-card"
+title="Combines all AI model outputs and calculates overall Grid Health Score.">
+    <h3>🧠 AI Fusion Core</h3>
+</div>
 <h1 id="gridHealth"
 style="
 font-size:48px;
@@ -751,8 +763,10 @@ margin:10px 0;
 
 </div>
 <div class="card" style="margin-top:20px;">
-
-<h3>🤖 Decision Engine</h3>
+<div class="decision-card"
+title="Generates intelligent actions such as load shifting and battery management.">
+    <h3>🤖 Decision Engine</h3>
+</div>
 
 <p>
 Decision Score:
