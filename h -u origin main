@@ -1,0 +1,9 @@
+[33m02ebd3a[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m Merge branch 'main' of https://github.com/Thaneya07/MicroGridX
+[33ma248c50[m Battery Intelligence Module
+[33m3c27219[m Completed fault prediction model integration
+[33m0721877[m Added AI fault prediction system with XGBoost models
+[33m29775db[m Integrated website, digital twin, backend and AI modules
+[33mba04be4[m Added complete demand forecasting module
+[33m1bb6884[m Completed Fault Prediction Module
+[33md99d6b0[m Added Fault Prediction Model with Random Forest and trained model
+[33m83f7cc9[m Initial commit

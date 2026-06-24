@@ -134,9 +134,12 @@ margin-top:15px;
 perspective:1200px;
 display:flex;
 justify-content:center;
-margin-top:20px;
-}
 
+min-height:420px;
+
+margin-top:20px;
+margin-bottom:40px;
+}
 .twin-cube{
 width:320px;
 height:320px;
@@ -618,7 +621,7 @@ body.light-mode #communityMsg {
 
 <!-- SAME HTML STRUCTURE (NO CHANGE) -->
 
-<div class="hardware-panel">
+<div class="hardware-panel"style="margin-top:25px;">
 <h2 class="section-title">Digital Twin Hardware</h2>
 
 <div class="cube-wrapper">
@@ -633,6 +636,21 @@ body.light-mode #communityMsg {
 
 </div>
 </div>
+<div class="card"
+style="margin-top:30px;">
+<h4>📡 Live Hardware Status</h4>
+
+<p>ESP32 : Online 🟢</p>
+<p>DHT22 : Active 🟢</p>
+<p>INA219 : Active 🟢</p>
+<p>WiFi : Connected 🟢</p>
+
+</div>
+<div class="card"style="margin-top:20px;">
+<h4>🕒 Last Sensor Update</h4>
+<p id="lastUpdate">--</p>
+</div>
+
 </div>
 
 <div class="digital-panel" id="overviewSection">
@@ -666,6 +684,37 @@ body.light-mode #communityMsg {
 <p id="faultProbability">30%</p>
 </div>
 
+<!-- LIVE SENSOR CARDS -->
+
+<div class="card">
+<h4>🌡 Temperature</h4>
+<p id="liveTemp">--</p>
+</div>
+
+<div class="card">
+<h4>💧 Humidity</h4>
+<p id="liveHumidity">--</p>
+</div>
+
+<div class="card">
+<h4>⚡ Voltage</h4>
+<p id="liveVoltage">--</p>
+</div>
+
+<div class="card">
+<h4>🔌 Current</h4>
+<p id="liveCurrent">--</p>
+</div>
+
+<div class="card">
+<h4>🔋 Live Battery</h4>
+<p id="liveBattery">--</p>
+</div>
+<div class="card">
+<h4>📶 Network</h4>
+<p id="networkStatus">ONLINE</p>
+</div>
+
 </div>
 
 <div class="status" id="systemStatus">Waiting...</div>
@@ -675,6 +724,17 @@ body.light-mode #communityMsg {
 💡 Recommendation: Waiting...
 </div>
 <div class="card" style="margin-top:20px;text-align:center;">
+<div id="systemBadge"
+style="
+padding:10px;
+border-radius:8px;
+text-align:center;
+font-weight:bold;
+background:#22c55e;
+margin-bottom:10px;
+">
+SYSTEM HEALTHY
+</div>
 
 <h3>🧠 AI Fusion Core</h3>
 
@@ -728,7 +788,10 @@ Waiting...
 </div>
 
 <script>
+let labels = []
 
+let temperatureHistory = []
+let batteryHistory = []
 // CLOCK
 setInterval(()=>{
 clock.innerText="⏱ "+new Date().toLocaleTimeString()
@@ -748,6 +811,8 @@ setTimeout(()=>p.remove(),3000)
 function sendSMS(msg){
 gsmBox.innerText="📡 SMS: "+msg
 }
+networkStatus.innerText =
+"ESP32 CONNECTED"
 
 // 🔥 FIXED FETCH (IMPORTANT)
 async function fetchData(){
@@ -761,8 +826,68 @@ const res = await fetch("/api/data")
 if(!res.ok) throw new Error()
 
 const data = await res.json()
-console.log(data)
 
+const sensorRes = await fetch("/live-sensors")
+const sensorData = await sensorRes.json()
+document.getElementById(
+"lastUpdate"
+).innerText =
+new Date().toLocaleTimeString()
+
+document.getElementById(
+"liveTemp"
+).innerText =
+sensorData.temperature + " °C"
+
+document.getElementById(
+"liveHumidity"
+).innerText =
+sensorData.humidity + " %"
+
+document.getElementById(
+"liveVoltage"
+).innerText =
+sensorData.voltage + " V"
+
+document.getElementById(
+"liveCurrent"
+).innerText =
+sensorData.current + " mA"
+if(sensorData.temperature > 40)
+{
+    systemBadge.innerText = "WARNING"
+    systemBadge.style.background = "red"
+}
+else
+{
+    systemBadge.innerText = "SYSTEM HEALTHY"
+    systemBadge.style.background = "#22c55e"
+}
+
+document.getElementById(
+"liveBattery"
+).innerText =
+sensorData.battery_level + " %"
+labels.push(
+    new Date().toLocaleTimeString()
+)
+
+temperatureHistory.push(
+    sensorData.temperature
+)
+
+batteryHistory.push(
+    sensorData.battery_level
+)
+
+if(labels.length > 10)
+{
+    labels.shift()
+    temperatureHistory.shift()
+    batteryHistory.shift()
+}
+
+energyChart.update()
 systemStatus.innerText="Mode: "+data.decision.energy_mode+" ✅"
 
 solar.innerText=data.energy_status.solar_power+" W"
@@ -854,7 +979,7 @@ sendSMS("Demand High")
 alert2.innerText="⚡ Demand High"
 }
 
-if(data.energy_status.temperature>40){
+if(sensorData.temperature > 40){
 showPopup("🔥 High Temp","red")
 sendSMS("Temp High")
 alert3.innerText="🔥 Temperature High"
@@ -874,17 +999,36 @@ systemStatus.innerText=
 setInterval(fetchData,2000)
 fetchData()
 // GRAPH
-new Chart(document.getElementById("energyChart"),{
-type:"line",
-data:{
-labels:["1","2","3","4","5"],
-datasets:[
-{label:"Solar",data:[200,240,260,280,300]},
-{label:"Battery",data:[70,72,75,78,80]}
-]
-}
-})
+const energyChart = new Chart(
+document.getElementById("energyChart"),
+{
+    type:"line",
 
+    data:{
+        labels: labels,
+
+        datasets:[
+
+        {
+            label:"Temperature",
+            data: temperatureHistory,
+            borderWidth:2
+        },
+
+        {
+            label:"Battery",
+            data: batteryHistory,
+            borderWidth:2
+        }
+
+        ]
+    },
+
+    options:{
+        responsive:true,
+        animation:false
+    }
+})
 
 </script>
 
